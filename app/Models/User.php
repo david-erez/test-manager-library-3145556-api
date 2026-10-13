@@ -2,31 +2,28 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use App\Models\Concerns\HasUuid;
+use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+// spec.md HU-02/AC-02.2: username normalized (lowercase, trimmed) and unique. The password
+// hash is never visible outside the model (Article IX / NFR-3).
+class User extends Model
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasUuid;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_LIBRARIAN = 'librarian';
+
+    public $timestamps = false;
+
+    protected $table = 'library.user';
+
+    protected $fillable = ['username', 'password_hash', 'role'];
+
+    protected $hidden = ['password_hash'];
+
+    public function setUsernameAttribute(string $value): void
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        $this->attributes['username'] = strtolower(trim($value));
     }
 }

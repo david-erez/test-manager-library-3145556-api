@@ -47,6 +47,15 @@ return [
             'report' => false,
         ],
 
+        // plan.md D-08: covers as a binary in external storage (disk locally, swappable to s3
+        // in production); the database only ever stores the opaque cover_key.
+        'covers' => [
+            'driver' => 'local',
+            'root' => env('COVERS_DIR', storage_path('app/covers')),
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
